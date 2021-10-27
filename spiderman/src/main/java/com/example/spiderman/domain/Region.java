@@ -31,7 +31,7 @@ public class Region {
 
     private String grade;
 
-    private int hasChild = 0;
+    private int hasChild;
 
     private String status = "1";
 
