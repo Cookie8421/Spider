@@ -216,7 +216,7 @@ public class MyCrawler {
         System.out.println("任务开始时间：：" + startTime + "：：" + "任务结束时间：：" + new Date());
 
         try{
-            EasyExcel.write(new FileOutputStream("D:\\tmp\\Files\\最新区划2020(国家统计局).xls"), Region.class).sheet("模板").doWrite(regionList);
+            EasyExcel.write(new FileOutputStream("D:\\tmp\\Files\\最新区划2020(国家统计局).xlsx"), Region.class).sheet("模板").doWrite(regionList);
         } catch(FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -243,8 +243,8 @@ public class MyCrawler {
         font.setFontHeightInPoints((short) 12);
         font.setBold(true);
         style.setFont(font);
-        style.setVerticalAlignment(VerticalAlignment.CENTER);// 垂直
-        style.setAlignment(HorizontalAlignment.CENTER);// 水平
+        //style.setVerticalAlignment(VerticalAlignment.CENTER);// 垂直
+        //style.setAlignment(HorizontalAlignment.CENTER);// 水平
         // 表头
         XSSFCell hssfCell = (XSSFCell) row.createCell((short) 0);
 
@@ -278,8 +278,8 @@ public class MyCrawler {
 
         // 动态数据样式
         CellStyle rowStyle = wb.createCellStyle();
-        rowStyle.setVerticalAlignment(VerticalAlignment.CENTER);// 垂直
-        rowStyle.setAlignment(HorizontalAlignment.CENTER);// 水平
+        //rowStyle.setVerticalAlignment(VerticalAlignment.CENTER);// 垂直
+        //rowStyle.setAlignment(HorizontalAlignment.CENTER);// 水平
         rowStyle.setWrapText(true);  // 自动换行
 
         // 创建第一行
