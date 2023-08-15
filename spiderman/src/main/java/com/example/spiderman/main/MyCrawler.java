@@ -15,9 +15,7 @@ import com.example.spiderman.page.RequestAndResponseTool;
 import com.example.spiderman.utils.RegexRule;
 import org.apache.logging.log4j.util.Strings;
 import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.VerticalAlignment;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -98,26 +96,40 @@ public class MyCrawler {
             if(page == null){
                 continue;
             }
-            page.setCharset("gbk");
+            page.setCharset("utf-8");
             Page finalPage = page;
 
+            Elements villagetr = null;
+            Elements citytr = null;
+            Elements provincetr = null;
+            Elements countytr = null;
+            Elements towntr = null;
+            Set<String> esSet = null;
             //对page中的元素进行处理： 访问DOM的某个标签
-            Elements villagetr = PageParserTool.select(finalPage, ".villagetr");
-            Elements citytr = PageParserTool.select(finalPage, ".citytr");
-            Elements provincetr = PageParserTool.select(finalPage, ".provincetr");
-            Elements countytr = PageParserTool.select(finalPage, ".countytr");
-            Elements towntr = PageParserTool.select(finalPage, ".towntr");
-            Set<String> esSet = PageParserTool.getLinks(finalPage,"a");
+            try{
+                villagetr = PageParserTool.select(finalPage, ".villagetr");
+                citytr = PageParserTool.select(finalPage, ".citytr");
+                provincetr = PageParserTool.select(finalPage, ".provincetr");
+                countytr = PageParserTool.select(finalPage, ".countytr");
+                towntr = PageParserTool.select(finalPage, ".towntr");
+                esSet = PageParserTool.getLinks(finalPage,"a");
+            } catch(Exception e){
+                e.printStackTrace();
+                System.out.println("发生超时+++++++++++++++++++++++++++++++++++++++++++++++++重新放入队列！");
+                Links.addUnvisitedUrlQueue(visitUrl);
+                continue;
+            }
 
-            Iterator villagetri = villagetr.iterator();
-            Iterator citytri = citytr.iterator();
+
             Iterator provincetri = provincetr.iterator();
+            Iterator citytri = citytr.iterator();
             Iterator countytri = countytr.iterator();
             Iterator towntri = towntr.iterator();
+            Iterator villagetri = villagetr.iterator();
 
             //该页面的新爬取路径入队
             RegexRule regexRule = new RegexRule();
-            regexRule.addPositive("http://www.stats.gov.cn/tjsj/tjbz/tjyqhdmhcxhfdm/2020/.*");
+            regexRule.addPositive("http://www.stats.gov.cn/sj/tjbz/tjyqhdmhcxhfdm/2022/.*");
             if(CollectionUtils.isNotEmpty(esSet)){
                 Iterator i = esSet.iterator();
                 while(i.hasNext()){
@@ -183,7 +195,7 @@ public class MyCrawler {
                     Elements tds = tr.children();
                     if(tds.get(0).getElementsByTag("a").isEmpty()){
                         regionList.add(new Region(tds.get(0).text(), tds.get(1).text(), "town", 0));
-                        System.out.println("county填入list：" + tds.get(0).text() + "：：" + tds.get(1).text());
+                        System.out.println("town填入list：" + tds.get(0).text() + "：：" + tds.get(1).text());
                     } else {
                         regionList.add(new Region(tds.get(0).getElementsByTag("a").text(), tds.get(1).getElementsByTag("a").text(), "town", 1));
                         System.out.println("town填入list：：" + tds.get(0).getElementsByTag("a").text() + "：：" + tds.get(1).getElementsByTag("a").text());
@@ -216,7 +228,7 @@ public class MyCrawler {
         System.out.println("任务开始时间：：" + startTime + "：：" + "任务结束时间：：" + new Date());
 
         try{
-            EasyExcel.write(new FileOutputStream("D:\\tmp\\Files\\最新区划2020(国家统计局).xlsx"), Region.class).sheet("模板").doWrite(regionList);
+            EasyExcel.write(new FileOutputStream("D:\\tmp\\docs\\最新区划2022(国家统计局).xlsx"), Region.class).sheet("区划信息").doWrite(regionList);
         } catch(FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -225,7 +237,7 @@ public class MyCrawler {
 
     }
 
-    @Deprecated
+    /*@Deprecated
     public static void exportExcel(Queue<Region> regionQueue, String filepath, int fileNum){
 
         // 创建excel
@@ -306,11 +318,11 @@ public class MyCrawler {
 
             rowCount++;
         }
-        /*for (Region region : regionList) {
+        *//*for (Region region : regionList) {
             //如果行数超过预设值，剩余的数据另外生成一个excel
-            *//*if(rowCount == rowLimit){
+            *//**//*if(rowCount == rowLimit){
                 regionRemainList.add(region);
-            } else {*//*
+            } else {*//**//*
                 // Excel行数计数器
                 row = sheet.createRow(rowCount);
 
@@ -331,10 +343,10 @@ public class MyCrawler {
 
                 rowCount++;
             //}
-        }*/
-        /*if(regionRemainList.size() > 0){
+        }*//*
+        *//*if(regionRemainList.size() > 0){
             exportExcel(regionRemainList, filepath, fileNum+1);
-        }*/
+        }*//*
         try {
             OutputStream out = null;
             String fileName = filepath + fileNum + ".xlsx";
@@ -347,11 +359,13 @@ public class MyCrawler {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
+    }*/
 
     //main 方法入口
     public static void main(String[] args) {
         MyCrawler crawler = new MyCrawler();
-        crawler.crawling(new String[]{"http://www.stats.gov.cn/tjsj/tjbz/tjyqhdmhcxhfdm/2020/index.html"});
+        //http://www.stats.gov.cn/sj/tjbz/tjyqhdmhcxhfdm/2022/11/1101.html
+        crawler.crawling(new String[]{"http://www.stats.gov.cn/sj/tjbz/tjyqhdmhcxhfdm/2022/index.html"});
+        //crawler.crawling(new String[]{"http://www.stats.gov.cn/sj/tjbz/tjyqhdmhcxhfdm/2022/12/1201.html"});
     }
 }
