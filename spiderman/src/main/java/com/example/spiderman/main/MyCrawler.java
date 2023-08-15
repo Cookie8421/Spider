@@ -12,7 +12,6 @@ import com.example.spiderman.link.Links;
 import com.example.spiderman.page.HttpHelper;
 import com.example.spiderman.page.Page;
 import com.example.spiderman.page.PageParserTool;
-import com.example.spiderman.page.RequestAndResponseTool;
 import com.example.spiderman.utils.RegexRule;
 import org.apache.logging.log4j.util.Strings;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -104,7 +103,7 @@ public class MyCrawler {
         List<Region> regionList = new CopyOnWriteArrayList<>();
 
         RegexRule regexRule = new RegexRule();
-        regexRule.addPositive("http://www.stats.gov.cn/tjsj/tjbz/tjyqhdmhcxhfdm/2020/.*");
+        regexRule.addPositive("http://www.stats.gov.cn/sj/tjbz/tjyqhdmhcxhfdm/2022/.*");
 
         boolean flag = true;
         //多线程
@@ -150,7 +149,7 @@ public class MyCrawler {
         System.out.println("任务开始时间：：" + startTime + "：：" + "任务结束时间：：" + new Date());
 
         try{
-            EasyExcel.write(new FileOutputStream("D:\\tmp\\Files\\最新区划2020(国家统计局).xls"), Region.class).sheet("模板").doWrite(regionList);
+            EasyExcel.write(new FileOutputStream("D:\\tmp\\docs\\最新区划2022(国家统计局).xls"), Region.class).sheet("区划信息").doWrite(regionList);
         } catch(FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -390,6 +389,6 @@ public class MyCrawler {
     //main 方法入口
     public static void main(String[] args) {
         MyCrawler crawler = new MyCrawler();
-        crawler.crawling(new String[]{"http://www.stats.gov.cn/tjsj/tjbz/tjyqhdmhcxhfdm/2020/index.html"});
+        crawler.crawling(new String[]{"http://www.stats.gov.cn/sj/tjbz/tjyqhdmhcxhfdm/2022/index.html"});
     }
 }
