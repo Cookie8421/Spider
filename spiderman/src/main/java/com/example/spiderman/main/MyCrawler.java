@@ -94,11 +94,10 @@ public class MyCrawler {
                 Links.addUnvisitedUrlQueue(visitUrl);
             }
             if(page == null){
+                System.out.println("未读取到数据+++++++++++++++++++++++++++++++++++++++++++++重新放入队列！");
+                Links.addUnvisitedUrlQueue(visitUrl);
                 continue;
             }
-            page.setCharset("utf-8");
-            Page finalPage = page;
-
             Elements villagetr = null;
             Elements citytr = null;
             Elements provincetr = null;
@@ -107,19 +106,27 @@ public class MyCrawler {
             Set<String> esSet = null;
             //对page中的元素进行处理： 访问DOM的某个标签
             try{
-                villagetr = PageParserTool.select(finalPage, ".villagetr");
-                citytr = PageParserTool.select(finalPage, ".citytr");
-                provincetr = PageParserTool.select(finalPage, ".provincetr");
-                countytr = PageParserTool.select(finalPage, ".countytr");
-                towntr = PageParserTool.select(finalPage, ".towntr");
-                esSet = PageParserTool.getLinks(finalPage,"a");
+                villagetr = PageParserTool.select(page, ".villagetr");
+                citytr = PageParserTool.select(page, ".citytr");
+                provincetr = PageParserTool.select(page, ".provincetr");
+                countytr = PageParserTool.select(page, ".countytr");
+                towntr = PageParserTool.select(page, ".towntr");
+                esSet = PageParserTool.getLinks(page,"a");
             } catch(Exception e){
                 e.printStackTrace();
                 System.out.println("发生超时+++++++++++++++++++++++++++++++++++++++++++++++++重新放入队列！");
                 Links.addUnvisitedUrlQueue(visitUrl);
                 continue;
             }
-
+            if(provincetr.size() == 0
+                && citytr.size() == 0
+                && countytr.size() == 0
+                && towntr.size() == 0
+                && villagetr.size() == 0){
+                System.out.println("发生超时+++++++++++++++++++++++++++++++++++++++++++++++++重新放入队列！");
+                Links.addUnvisitedUrlQueue(visitUrl);
+                continue;
+            }
 
             Iterator provincetri = provincetr.iterator();
             Iterator citytri = citytr.iterator();
@@ -169,10 +176,10 @@ public class MyCrawler {
                     Elements tds = tr.children();
                     if(tds.get(0).getElementsByTag("a").isEmpty()){
                         regionList.add(new Region(tds.get(0).text(), tds.get(1).text(), "city", 0));
-                        System.out.println("城市填入list：：" + tds.get(0).text() + "：：" + tds.get(1).text());
+                        System.out.println("city填入list：：" + tds.get(0).text() + "：：" + tds.get(1).text());
                     } else {
                         regionList.add(new Region(tds.get(0).getElementsByTag("a").text(), tds.get(1).getElementsByTag("a").text(), "city", 1));
-                        System.out.println("城市填入list：：" + tds.get(0).getElementsByTag("a").text() + "：：" + tds.get(1).getElementsByTag("a").text());
+                        System.out.println("city填入list：：" + tds.get(0).getElementsByTag("a").text() + "：：" + tds.get(1).getElementsByTag("a").text());
                     }
                 }
             } else if(!countytr.isEmpty()){
@@ -189,7 +196,7 @@ public class MyCrawler {
                     }
                 }
             } else if(!towntr.isEmpty()){
-                //地区一级的td放入结果集
+                //街道一级的td放入结果集
                 while(towntri.hasNext()){
                     Element tr = (Element)towntri.next();
                     Elements tds = tr.children();
@@ -207,7 +214,7 @@ public class MyCrawler {
                     Element tr = (Element)villagetri.next();
                     Elements tds = tr.children();
                     regionList.add(new Region(tds.get(0).text(), tds.get(2).text(), "village", 0));
-                    System.out.println("village填入map：" + tds.get(0).text() + "：：" + tds.get(2).text());
+                    System.out.println("village填入list：：" + tds.get(0).text() + "：：" + tds.get(2).text());
                 }
             }
 
@@ -221,9 +228,9 @@ public class MyCrawler {
 
         }
 
-        for(Region region : regionList){
+        /*for(Region region : regionList){
             System.out.println("区域编码结果集：：" + region.getRegionCode() + "::" + region.getRegionName());
-        }
+        }*/
         System.out.println("结果集总数：：" + regionList.size() + "：：" + "开始写入表格！");
         System.out.println("任务开始时间：：" + startTime + "：：" + "任务结束时间：：" + new Date());
 
@@ -364,8 +371,7 @@ public class MyCrawler {
     //main 方法入口
     public static void main(String[] args) {
         MyCrawler crawler = new MyCrawler();
-        //http://www.stats.gov.cn/sj/tjbz/tjyqhdmhcxhfdm/2022/11/1101.html
         crawler.crawling(new String[]{"http://www.stats.gov.cn/sj/tjbz/tjyqhdmhcxhfdm/2022/index.html"});
-        //crawler.crawling(new String[]{"http://www.stats.gov.cn/sj/tjbz/tjyqhdmhcxhfdm/2022/12/1201.html"});
+        //crawler.crawling(new String[]{"http://www.stats.gov.cn/sj/tjbz/tjyqhdmhcxhfdm/2022/44/01/440103.html"});
     }
 }

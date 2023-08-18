@@ -8,6 +8,7 @@ package com.example.spiderman.page;
  */
 
 import org.apache.commons.httpclient.DefaultHttpMethodRetryHandler;
+import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.HttpStatus;
@@ -27,6 +28,7 @@ public class RequestAndResponseTool {
         httpClient.getHttpConnectionManager().getParams().setConnectionTimeout(5000);
         // 2.生成 GetMethod 对象并设置参数
         GetMethod getMethod = new GetMethod(url);
+        getMethod.addRequestHeader(new Header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36"));
         // 设置 get 请求超时 5s
         getMethod.getParams().setParameter(HttpMethodParams.SO_TIMEOUT, 5000);
         // 设置请求重试处理
