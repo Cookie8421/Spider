@@ -51,7 +51,7 @@ public class MyCrawler {
      * @param seeds
      * @return
      */
-    public void crawling(String[] seeds) {
+    public void crawling(String[] seeds) throws Exception{
 
         Date startTime = new Date();
 
@@ -114,7 +114,7 @@ public class MyCrawler {
                 esSet = PageParserTool.getLinks(page,"a");
             } catch(Exception e){
                 e.printStackTrace();
-                System.out.println("发生超时+++++++++++++++++++++++++++++++++++++++++++++++++重新放入队列！");
+                System.out.println("解析数据错误+++++++++++++++++++++++++++++++++++++++++++++++++重新放入队列！");
                 Links.addUnvisitedUrlQueue(visitUrl);
                 continue;
             }
@@ -123,7 +123,7 @@ public class MyCrawler {
                 && countytr.size() == 0
                 && towntr.size() == 0
                 && villagetr.size() == 0){
-                System.out.println("发生超时+++++++++++++++++++++++++++++++++++++++++++++++++重新放入队列！");
+                System.out.println("未获取数据+++++++++++++++++++++++++++++++++++++++++++++++++重新放入队列！");
                 Links.addUnvisitedUrlQueue(visitUrl);
                 continue;
             }
@@ -231,14 +231,12 @@ public class MyCrawler {
         /*for(Region region : regionList){
             System.out.println("区域编码结果集：：" + region.getRegionCode() + "::" + region.getRegionName());
         }*/
+        System.out.println("访问过的页面总数：：" + Links.getVisitedUrlNum());
         System.out.println("结果集总数：：" + regionList.size() + "：：" + "开始写入表格！");
         System.out.println("任务开始时间：：" + startTime + "：：" + "任务结束时间：：" + new Date());
 
-        try{
-            EasyExcel.write(new FileOutputStream("D:\\tmp\\docs\\最新区划2022(国家统计局).xlsx"), Region.class).sheet("区划信息").doWrite(regionList);
-        } catch(FileNotFoundException e) {
-            e.printStackTrace();
-        }
+
+        EasyExcel.write(new FileOutputStream("D:\\tmp\\docs\\最新区划2022(国家统计局).xlsx"), Region.class).sheet("区划信息").doWrite(regionList);
 
         //exportExcel(regionList, "D:\\tmp\\Files\\最新区划2020(国家统计局)", 1);
 
@@ -371,7 +369,11 @@ public class MyCrawler {
     //main 方法入口
     public static void main(String[] args) {
         MyCrawler crawler = new MyCrawler();
-        crawler.crawling(new String[]{"http://www.stats.gov.cn/sj/tjbz/tjyqhdmhcxhfdm/2022/index.html"});
-        //crawler.crawling(new String[]{"http://www.stats.gov.cn/sj/tjbz/tjyqhdmhcxhfdm/2022/44/01/440103.html"});
+        try{
+            crawler.crawling(new String[]{"http://www.stats.gov.cn/sj/tjbz/tjyqhdmhcxhfdm/2022/index.html"});
+            //crawler.crawling(new String[]{"http://www.stats.gov.cn/sj/tjbz/tjyqhdmhcxhfdm/2022/44/01/440103.html"});
+        } catch(Exception e){
+            e.printStackTrace();
+        }
     }
 }
