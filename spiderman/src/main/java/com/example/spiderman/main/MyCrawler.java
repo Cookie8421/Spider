@@ -13,6 +13,9 @@ import com.example.spiderman.page.Page;
 import com.example.spiderman.page.PageParserTool;
 import com.example.spiderman.page.RequestAndResponseTool;
 import com.example.spiderman.utils.RegexRule;
+import com.google.common.base.Charsets;
+import com.google.common.hash.BloomFilter;
+import com.google.common.hash.Funnels;
 import org.apache.logging.log4j.util.Strings;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
@@ -231,7 +234,6 @@ public class MyCrawler {
         /*for(Region region : regionList){
             System.out.println("区域编码结果集：：" + region.getRegionCode() + "::" + region.getRegionName());
         }*/
-        System.out.println("访问过的页面总数：：" + Links.getVisitedUrlNum());
         System.out.println("结果集总数：：" + regionList.size() + "：：" + "开始写入表格！");
         System.out.println("任务开始时间：：" + startTime + "：：" + "任务结束时间：：" + new Date());
 

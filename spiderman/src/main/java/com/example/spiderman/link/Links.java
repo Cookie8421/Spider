@@ -6,9 +6,14 @@ package com.example.spiderman.link;
  * @Description:
  * @date 2019/1/25 11:19
  */
+import com.google.common.base.Charsets;
+import com.google.common.hash.BloomFilter;
+import com.google.common.hash.Funnels;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.SynchronousQueue;
 
 /*
  *  Link主要功能;
@@ -19,43 +24,47 @@ import java.util.Set;
 public class Links {
 
     //已访问的 url 集合  已经访问过的 主要考虑 不能再重复了 使用set来保证不重复;
-    private static Set visitedUrlSet = new HashSet();
+    //private static Set visitedUrlSet = new HashSet();
+
+    //优化：访问过的url用布隆过滤器存储【参数根据需求自行调整】，详见https://krisives.github.io/bloom-calculator/
+    private static BloomFilter<CharSequence> bf = BloomFilter.create(
+            Funnels.stringFunnel(Charsets.UTF_8), 100000, 0.0001);
 
     //待访问的 url 集合  待访问的主要考虑 1:规定访问顺序;2:保证不提供重复的待访问地址;
-    private static LinkedList unVisitedUrlQueue = new LinkedList();
+    private static LinkedBlockingQueue<String> unVisitedUrlQueue = new LinkedBlockingQueue<>();
 
     //获得已经访问的 URL 数目
-    public static int getVisitedUrlNum() {
+    /*public static int getVisitedUrlNum() {
         return visitedUrlSet.size();
-    }
+    }*/
 
     //添加到访问过的 URL
     public static void addVisitedUrlSet(String url) {
-        visitedUrlSet.add(url);
+        bf.put(url);
     }
 
     //移除访问过的 URL
-    public static void removeVisitedUrlSet(String url) {
+    /*public static void removeVisitedUrlSet(String url) {
         visitedUrlSet.remove(url);
-    }
+    }*/
 
 
 
     //获得 待访问的 url 集合
-    public static LinkedList getUnVisitedUrlQueue() {
+    public static LinkedBlockingQueue getUnVisitedUrlQueue() {
         return unVisitedUrlQueue;
     }
 
     // 添加到待访问的集合中  保证每个 URL 只被访问一次
     public static void addUnvisitedUrlQueue(String url) {
-        if (url != null && !url.trim().equals("")  && !visitedUrlSet.contains(url)  && !unVisitedUrlQueue.contains(url)){
+        if (url != null && !url.trim().equals("")  && !bf.mightContain(url)  && !unVisitedUrlQueue.contains(url)){
             unVisitedUrlQueue.add(url);
         }
     }
 
     //删除 待访问的url
     public static Object removeHeadOfUnVisitedUrlQueue() {
-        return unVisitedUrlQueue.removeFirst();
+        return unVisitedUrlQueue.poll();
     }
 
     //判断未访问的 URL 队列中是否为空
